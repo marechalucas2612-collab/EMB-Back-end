@@ -89,6 +89,26 @@ app.get('/api/admin/messages', authAdmin, async (req, res) => {
   }
 });
 
+// Route pour supprimer un message spécifique
+app.delete('/api/messages/:id', async (req, res) => {
+    const adminPassword = req.headers['x-admin-password'];
+    
+    // Sécurité : on vérifie le mot de passe avant de supprimer
+    if (adminPassword !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ error: 'Non autorisé' });
+    }
+
+    try {
+        const result = await Message.findByIdAndDelete(req.params.id);
+        if (!result) {
+            return res.status(404).json({ error: 'Message non trouvé' });
+        }
+        res.json({ message: 'Message supprimé avec succès' });
+    } catch (err) {
+        res.status(500).json({ error: 'Erreur lors de la suppression' });
+    }
+});
+
 // PATCH /api/admin/messages/:id — Mettre à jour le statut
 app.patch('/api/admin/messages/:id', authAdmin, async (req, res) => {
   try {
