@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prendre contact — EMB Consulting</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ── Variables ── */
+    :root {
+      --bg:         #f7f5f0;
+      --fg:         #0f0f14;
+      --card:       #ffffff;
+      --muted:      #eeece6;
+      --muted-fg:   #6b6b7a;
+      --border:     rgba(15,15,20,0.10);
+      --highlight:  #1a3a6b;
+      --hl-light:   #e8eef7;
+      --green:      #22c55e;
+      --red:        #ef4444;
+      --radius:     14px;
+      --font-disp:  'Playfair Display', Georgia, serif;
+      --font-body:  'DM Sans', sans-serif;
+      --ease:       cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* ── Left panel — branding ── */
+    .panel-left {
+      background: var(--highlight);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 4rem;
+      overflow: hidden;
+    }
+
+    .panel-left::before {
+      content: 'EMB';
+      position: absolute;
+      bottom: -3rem;
+      left: -2rem;
+      font-family: var(--font-disp);
+      font-size: 22rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.04);
+      line-height: 1;
+      pointer-events: none;
+      letter-spacing: -0.05em;
+    }
+
+    .brand-logo {
+      font-family: var(--font-disp);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #fff;
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-left-body { position: relative; z-index: 1; }
+
+    .panel-eyebrow {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .panel-eyebrow::before {
+      content: '';
+      display: block;
+      width: 2rem;
+      height: 1.5px;
+      background: rgba(255,255,255,0.4);
+    }
+
+    .panel-title {
+      font-family: var(--font-disp);
+      font-size: clamp(2.5rem, 4vw, 3.5rem);
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+    }
+
+    .panel-title em {
+      font-style: italic;
+      color: rgba(255,255,255,0.65);
+    }
+
+    .panel-desc {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.65);
+      max-width: 36ch;
+    }
+
+    .panel-promises {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .promise-item {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.8);
+      font-weight: 500;
+    }
+
+    .promise-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+
+    /* ── Right panel — form ── */
+    .panel-right {
+      padding: 4rem;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      overflow-y: auto;
+    }
+
+    .form-wrapper {
+      width: 100%;
+      max-width: 520px;
+      padding: 2rem 0;
+    }
+
+    .form-header {
+      margin-bottom: 2.5rem;
+    }
+
+    .form-step-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted-fg);
+      margin-bottom: 0.75rem;
+    }
+
+    .form-title {
+      font-family: var(--font-disp);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--fg);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    /* ── Form fields ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--fg);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    label .req { color: var(--highlight); margin-left: 2px; }
+
+    input, select, textarea {
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      color: var(--fg);
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.85rem 1rem;
+      outline: none;
+      transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+      width: 100%;
+    }
+
+    input::placeholder, textarea::placeholder { color: var(--muted-fg); }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--highlight);
+      box-shadow: 0 0 0 3px rgba(26,58,107,0.08);
+    }
+
+    input.error, select.error, textarea.error {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(239,68,68,0.08);
+    }
+
+    .field-error {
+      font-size: 0.75rem;
+      color: var(--red);
+      display: none;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .field-error.visible { display: flex; }
+
+    select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b7a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem; }
+
+    textarea { resize: vertical; min-height: 130px; line-height: 1.65; }
+
+    /* ── Divider ── */
+    .form-divider {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 0.25rem 0;
+    }
+    .form-divider span {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--muted-fg);
+      white-space: nowrap;
+    }
+    .form-divider::before, .form-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Submit ── */
+    .form-submit {
+      margin-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--highlight);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      padding: 1rem 2rem;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(26,58,107,0.28);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-submit .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    .btn-submit.loading .spinner { display: block; }
+    .btn-submit.loading .btn-text { opacity: 0; position: absolute; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .form-privacy {
+      font-size: 0.75rem;
+      color: var(--muted-fg);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    /* ── Success state ── */
+    .success-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 1.5rem;
+      min-height: 400px;
+    }
+
+    .success-screen.visible {
+      display: flex;
+    }
+
+    .success-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #dcfce7;
+      border: 2px solid #86efac;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+
+    .success-title {
+      font-family: var(--font-disp);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--fg);
+      letter-spacing: -0.02em;
+    }
+
+    .success-desc {
+      font-size: 1rem;
+      color: var(--muted-fg);
+      line-height: 1.65;
+      max-width: 36ch;
+    }
+
+    .btn-back {
+      background: var(--muted);
+      color: var(--fg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.8rem 1.75rem;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: background 0.2s;
+    }
+    .btn-back:hover { background: var(--border); }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      body { grid-template-columns: 1fr; }
+      .panel-left { display: none; }
+      .panel-right { padding: 2.5rem 1.5rem; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full { grid-column: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Left panel -->
+  <aside class="panel-left">
+    <a href="index.html" class="brand-logo">EMB Consulting</a>
+
+    <div class="panel-left-body">
+      <p class="panel-eyebrow">Nouvelle mission</p>
+      <h1 class="panel-title">Parlons de votre <em>projet data.</em></h1>
+      <p class="panel-desc">Décrivez votre besoin en quelques lignes. El Mohcine vous répond personnellement sous 24h.</p>
+    </div>
+
+    <div class="panel-promises">
+      <div class="promise-item">
+        <span class="promise-icon">✓</span>
+        Réponse garantie sous 24h
+      </div>
+      <div class="promise-item">
+        <span class="promise-icon">✓</span>
+        Premier échange sans engagement
+      </div>
+      <div class="promise-item">
+        <span class="promise-icon">✓</span>
+        Devis personnalisé sous 48h
+      </div>
+      <div class="promise-item">
+        <span class="promise-icon">🔒</span>
+        Vos données restent confidentielles
+      </div>
+    </div>
+  </aside>
+
+  <!-- Right panel — Form -->
+  <main class="panel-right">
+    <div class="form-wrapper">
+
+      <!-- Form -->
+      <div id="formView">
+        <div class="form-header">
+          <p class="form-step-label">Formulaire de contact</p>
+          <h2 class="form-title">Votre demande</h2>
+        </div>
+
+        <form id="contactForm" novalidate>
+          <div class="form-grid">
+
+            <!-- Identité -->
+            <div class="form-group">
+              <label for="nom">Nom complet <span class="req">*</span></label>
+              <input type="text" id="nom" name="nom" placeholder="Jean Dupont" autocomplete="name">
+              <span class="field-error" id="err-nom">⚠ Ce champ est requis</span>
+            </div>
+
+            <div class="form-group">
+              <label for="entreprise">Entreprise</label>
+              <input type="text" id="entreprise" name="entreprise" placeholder="Acme SAS" autocomplete="organization">
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email <span class="req">*</span></label>
+              <input type="email" id="email" name="email" placeholder="jean@acme.fr" autocomplete="email">
+              <span class="field-error" id="err-email">⚠ Email invalide</span>
+            </div>
+
+            <div class="form-group">
+              <label for="telephone">Téléphone</label>
+              <input type="tel" id="telephone" name="telephone" placeholder="06 XX XX XX XX" autocomplete="tel">
+            </div>
+
+            <!-- Mission -->
+            <div class="form-divider"><span>Votre besoin</span></div>
+
+            <div class="form-group">
+              <label for="mission">Type de mission</label>
+              <select id="mission" name="mission">
+                <option value="" disabled selected>Sélectionner…</option>
+                <option value="Audit data">Audit & diagnostic data</option>
+                <option value="Data Governance">Gouvernance des données</option>
+                <option value="BI & Dashboard">Business Intelligence & Dashboards</option>
+                <option value="Migration">Migration de données / systèmes</option>
+                <option value="PIM">Product Information Management (PIM)</option>
+                <option value="Machine Learning">Machine Learning & IA</option>
+                <option value="Formation">Formation / Intervention</option>
+                <option value="Autre">Autre</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="budget">Budget estimé</label>
+              <select id="budget" name="budget">
+                <option value="" disabled selected>Sélectionner…</option>
+                <option value="< 5k€">&lt; 5 000 €</option>
+                <option value="5k–15k€">5 000 – 15 000 €</option>
+                <option value="15k–50k€">15 000 – 50 000 €</option>
+                <option value="> 50k€">&gt; 50 000 €</option>
+                <option value="À définir">À définir ensemble</option>
+              </select>
+            </div>
+
+            <div class="form-group full">
+              <label for="message">Décrivez votre projet <span class="req">*</span></label>
+              <textarea id="message" name="message" placeholder="Expliquez votre contexte, vos enjeux, ce que vous souhaitez accomplir…"></textarea>
+              <span class="field-error" id="err-message">⚠ Ce champ est requis</span>
+            </div>
+
+          </div>
+
+          <div class="form-submit">
+            <button type="submit" class="btn-submit" id="submitBtn">
+              <span class="btn-text">Envoyer ma demande →</span>
+              <span class="spinner"></span>
+            </button>
+            <p class="form-privacy">En soumettant ce formulaire, vous acceptez que vos informations soient utilisées uniquement pour répondre à votre demande.</p>
+          </div>
+        </form>
+      </div>
+
+      <!-- Success screen -->
+      <div class="success-screen" id="successView">
+        <div class="success-icon">✓</div>
+        <h2 class="success-title">Message envoyé !</h2>
+        <p class="success-desc">El Mohcine a bien reçu votre demande et vous répondra personnellement sous 24h.</p>
+        <a href="index.html" class="btn-back">← Retour au site</a>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const API_BASE = 'http://localhost:3001'; // ← Changer en prod
+
+    const form = document.getElementById('contactForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function setError(fieldId, errId, show) {
+      const field = document.getElementById(fieldId);
+      const err   = document.getElementById(errId);
+      if (!field || !err) return;
+      field.classList.toggle('error', show);
+      err.classList.toggle('visible', show);
+    }
+
+    function validate() {
+      let ok = true;
+      const nom     = document.getElementById('nom').value.trim();
+      const email   = document.getElementById('email').value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      if (!nom) { setError('nom', 'err-nom', true); ok = false; }
+      else       { setError('nom', 'err-nom', false); }
+
+      const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || !emailRx.test(email)) { setError('email', 'err-email', true); ok = false; }
+      else                                 { setError('email', 'err-email', false); }
+
+      if (!message) { setError('message', 'err-message', true); ok = false; }
+      else           { setError('message', 'err-message', false); }
+
+      return ok;
+    }
+
+    // Clear errors on input
+    ['nom', 'email', 'message'].forEach(id => {
+      document.getElementById(id)?.addEventListener('input', () => {
+        document.getElementById(id).classList.remove('error');
+        document.querySelector(`#err-${id}`)?.classList.remove('visible');
+      });
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validate()) return;
+
+      submitBtn.classList.add('loading');
+      submitBtn.disabled = true;
+
+      const payload = {
+        nom:        document.getElementById('nom').value.trim(),
+        entreprise: document.getElementById('entreprise').value.trim(),
+        email:      document.getElementById('email').value.trim(),
+        telephone:  document.getElementById('telephone').value.trim(),
+        budget:     document.getElementById('budget').value,
+        mission:    document.getElementById('mission').value,
+        message:    document.getElementById('message').value.trim(),
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/api/contact`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (res.ok) {
+          document.getElementById('formView').style.display = 'none';
+          document.getElementById('successView').classList.add('visible');
+        } else {
+          const data = await res.json();
+          alert('Erreur : ' + (data.error || 'Veuillez réessayer.'));
+        }
+      } catch {
+        alert('Impossible de joindre le serveur. Vérifiez votre connexion.');
+      } finally {
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

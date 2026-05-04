@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — EMB Consulting</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #0f0f14;
+      --bg2:       #16161d;
+      --bg3:       #1c1c25;
+      --border:    rgba(255,255,255,0.07);
+      --border-hi: rgba(255,255,255,0.14);
+      --fg:        #f0ede6;
+      --fg2:       rgba(240,237,230,0.55);
+      --fg3:       rgba(240,237,230,0.3);
+      --hl:        #3b6fd4;
+      --hl-light:  rgba(59,111,212,0.15);
+      --green:     #22c55e;
+      --green-bg:  rgba(34,197,94,0.12);
+      --yellow:    #eab308;
+      --yellow-bg: rgba(234,179,8,0.12);
+      --blue:      #60a5fa;
+      --blue-bg:   rgba(96,165,250,0.12);
+      --red:       #f87171;
+      --red-bg:    rgba(248,113,113,0.12);
+      --radius:    12px;
+      --font-disp: 'Playfair Display', Georgia, serif;
+      --font-body: 'DM Sans', sans-serif;
+      --ease:      cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 15px; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      min-height: 100vh;
+    }
+
+    /* ── Login screen ── */
+    #loginScreen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+    }
+
+    .login-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: calc(var(--radius) * 2);
+      padding: 3rem;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .login-logo {
+      font-family: var(--font-disp);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--fg);
+      margin-bottom: 0.5rem;
+    }
+
+    .login-sub {
+      font-size: 0.8rem;
+      color: var(--fg2);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 2.5rem;
+    }
+
+    .login-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--fg2);
+      display: block;
+      text-align: left;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-input {
+      width: 100%;
+      background: var(--bg3);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.85rem 1rem;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      color: var(--fg);
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 1.25rem;
+    }
+
+    .login-input:focus { border-color: var(--hl); }
+
+    .login-btn {
+      width: 100%;
+      background: var(--hl);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.9rem;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s var(--ease);
+    }
+    .login-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    .login-error {
+      font-size: 0.8rem;
+      color: var(--red);
+      margin-top: 1rem;
+      display: none;
+    }
+    .login-error.visible { display: block; }
+
+    /* ── App shell ── */
+    #app { display: none; }
+    #app.visible { display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ── Topbar ── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(15,15,20,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .topbar-logo {
+      font-family: var(--font-disp);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--fg);
+    }
+
+    .topbar-badge {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: var(--hl-light);
+      color: var(--hl);
+      border: 1px solid rgba(59,111,212,0.3);
+      border-radius: 100px;
+      padding: 0.25rem 0.7rem;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .topbar-refresh {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--fg2);
+      border-radius: var(--radius);
+      padding: 0.4rem 0.9rem;
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .topbar-refresh:hover { color: var(--fg); border-color: var(--border-hi); }
+
+    .topbar-logout {
+      font-size: 0.78rem;
+      color: var(--fg3);
+      cursor: pointer;
+      transition: color 0.2s;
+      background: none;
+      border: none;
+      font-family: var(--font-body);
+    }
+    .topbar-logout:hover { color: var(--red); }
+
+    /* ── Main layout ── */
+    .main {
+      flex: 1;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* ── KPI strip ── */
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: calc(var(--radius) * 1.5);
+      padding: 1.5rem;
+      transition: border-color 0.2s;
+    }
+    .kpi-card:hover { border-color: var(--border-hi); }
+
+    .kpi-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--fg3);
+      margin-bottom: 0.75rem;
+    }
+
+    .kpi-value {
+      font-family: var(--font-disp);
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--fg);
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .kpi-value.accent { color: var(--hl); }
+
+    .kpi-sub {
+      font-size: 0.75rem;
+      color: var(--fg3);
+      margin-top: 0.4rem;
+    }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-title {
+      font-family: var(--font-disp);
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--fg);
+      letter-spacing: -0.02em;
+    }
+
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .filter-btn {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 0.4rem 1rem;
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--fg2);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-btn:hover { color: var(--fg); border-color: var(--border-hi); }
+    .filter-btn.active { background: var(--hl-light); border-color: rgba(59,111,212,0.4); color: var(--blue); }
+
+    .search-input {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.45rem 1rem;
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      color: var(--fg);
+      outline: none;
+      width: 200px;
+      transition: border-color 0.2s;
+    }
+    .search-input::placeholder { color: var(--fg3); }
+    .search-input:focus { border-color: var(--hl); }
+
+    /* ── Messages list ── */
+    .messages-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .msg-row {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: calc(var(--radius) * 1.5);
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.15s var(--ease);
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 1.25rem;
+      align-items: start;
+    }
+
+    .msg-row:hover { border-color: var(--border-hi); transform: translateX(3px); }
+    .msg-row.expanded { border-color: rgba(59,111,212,0.35); background: var(--bg3); }
+
+    .msg-status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+    .dot-nouveau   { background: var(--green); box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .dot-lu        { background: var(--fg3); }
+    .dot-en_traitement { background: var(--yellow); box-shadow: 0 0 6px rgba(234,179,8,0.4); }
+    .dot-clôturé   { background: var(--blue); }
+
+    .msg-main { min-width: 0; }
+
+    .msg-top {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.4rem;
+    }
+
+    .msg-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--fg);
+    }
+
+    .msg-company {
+      font-size: 0.8rem;
+      color: var(--fg3);
+    }
+
+    .badge {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border-radius: 100px;
+      padding: 0.2rem 0.6rem;
+    }
+
+    .badge-nouveau        { background: var(--green-bg); color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
+    .badge-lu             { background: rgba(255,255,255,0.05); color: var(--fg3); border: 1px solid var(--border); }
+    .badge-en_traitement  { background: var(--yellow-bg); color: var(--yellow); border: 1px solid rgba(234,179,8,0.25); }
+    .badge-clôturé        { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(96,165,250,0.25); }
+
+    .msg-preview {
+      font-size: 0.85rem;
+      color: var(--fg2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 600px;
+    }
+
+    .msg-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.4rem;
+      flex-shrink: 0;
+    }
+
+    .msg-date {
+      font-size: 0.75rem;
+      color: var(--fg3);
+      white-space: nowrap;
+    }
+
+    .msg-tags {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .tag-small {
+      font-size: 0.65rem;
+      font-weight: 500;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 0.15rem 0.55rem;
+      color: var(--fg3);
+    }
+
+    /* ── Expanded detail ── */
+    .msg-detail {
+      display: none;
+      grid-column: 2 / 3;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      margin-top: 1rem;
+    }
+
+    .msg-row.expanded .msg-detail { display: block; }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .detail-field label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--fg3);
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+
+    .detail-field span {
+      font-size: 0.88rem;
+      color: var(--fg);
+    }
+
+    .detail-field a {
+      color: var(--hl);
+      text-decoration: none;
+    }
+    .detail-field a:hover { text-decoration: underline; }
+
+    .detail-message-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--fg3);
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-message-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.25rem;
+      font-size: 0.9rem;
+      line-height: 1.75;
+      color: var(--fg);
+      white-space: pre-wrap;
+    }
+
+    .detail-actions {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.45rem 1rem;
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--fg2);
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .action-btn:hover { color: var(--fg); border-color: var(--border-hi); }
+
+    .action-btn.primary { background: var(--hl-light); border-color: rgba(59,111,212,0.3); color: var(--blue); }
+    .action-btn.primary:hover { background: rgba(59,111,212,0.25); }
+
+    .action-btn.danger { color: var(--red); }
+    .action-btn.danger:hover { border-color: rgba(248,113,113,0.3); background: var(--red-bg); }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center;
+      padding: 5rem 2rem;
+      color: var(--fg3);
+      display: none;
+    }
+    .empty-state.visible { display: block; }
+    .empty-state h3 { font-family: var(--font-disp); font-size: 1.5rem; color: var(--fg2); margin-bottom: 0.5rem; }
+    .empty-state p { font-size: 0.88rem; }
+
+    /* ── Loading ── */
+    .loading-bar {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--hl), transparent);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: 100px;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+    .loading-bar.visible { display: block; }
+    @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+      .detail-grid { grid-template-columns: 1fr 1fr; }
+      .msg-row { grid-template-columns: auto 1fr; }
+      .msg-meta { display: none; }
+    }
+    @media (max-width: 600px) {
+      .main { padding: 1.25rem; }
+      .kpi-strip { grid-template-columns: 1fr 1fr; }
+      .msg-row { grid-template-columns: auto 1fr; }
+      .detail-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Login ─────────────────────────────────────────── -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">EMB Consulting</div>
+    <p class="login-sub">Espace Administration</p>
+
+    <label class="login-label" for="loginPwd">Mot de passe</label>
+    <input type="password" id="loginPwd" class="login-input" placeholder="••••••••" autocomplete="current-password">
+    <button class="login-btn" onclick="doLogin()">Accéder au dashboard →</button>
+    <p class="login-error" id="loginError">Mot de passe incorrect.</p>
+  </div>
+</div>
+
+<!-- ── App ───────────────────────────────────────────── -->
+<div id="app">
+
+  <nav class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-logo">EMB Admin</span>
+      <span class="topbar-badge">Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-refresh" onclick="loadMessages()">
+        <span id="refreshIcon">↻</span> Actualiser
+      </button>
+      <button class="topbar-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </nav>
+
+  <main class="main">
+
+    <!-- KPIs -->
+    <div class="kpi-strip">
+      <div class="kpi-card">
+        <p class="kpi-label">Total messages</p>
+        <p class="kpi-value accent" id="kpiTotal">—</p>
+        <p class="kpi-sub">depuis le début</p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-label">Nouveaux</p>
+        <p class="kpi-value" id="kpiNew">—</p>
+        <p class="kpi-sub">non lus</p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-label">En traitement</p>
+        <p class="kpi-value" id="kpiProcessing">—</p>
+        <p class="kpi-sub">missions en cours</p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-label">Clôturés</p>
+        <p class="kpi-value" id="kpiClosed">—</p>
+        <p class="kpi-sub">dossiers traités</p>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <h2 class="toolbar-title">Messages reçus</h2>
+      <div class="toolbar-right">
+        <input type="text" class="search-input" id="searchInput" placeholder="Rechercher…" oninput="renderMessages()">
+        <button class="filter-btn active" data-filter="tous" onclick="setFilter('tous', this)">Tous</button>
+        <button class="filter-btn" data-filter="nouveau" onclick="setFilter('nouveau', this)">Nouveaux</button>
+        <button class="filter-btn" data-filter="en_traitement" onclick="setFilter('en_traitement', this)">En cours</button>
+        <button class="filter-btn" data-filter="clôturé" onclick="setFilter('clôturé', this)">Clôturés</button>
+      </div>
+    </div>
+
+    <!-- Loading bar -->
+    <div class="loading-bar" id="loadingBar"></div>
+
+    <!-- Messages -->
+    <div class="messages-list" id="messagesList"></div>
+    <div class="empty-state" id="emptyState">
+      <h3>Aucun message</h3>
+      <p>Aucun message ne correspond à ce filtre.</p>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  const API_BASE = 'http://localhost:3001'; // ← Changer en prod
+  let adminPassword = '';
+  let allMessages = [];
+  let currentFilter = 'tous';
+
+  // ── Auth ──────────────────────────────────────────
+  function doLogin() {
+    const pwd = document.getElementById('loginPwd').value;
+    if (!pwd) return;
+    adminPassword = pwd;
+    document.getElementById('loginError').classList.remove('visible');
+    loadMessages(true);
+  }
+
+  document.getElementById('loginPwd')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  function logout() {
+    adminPassword = '';
+    allMessages = [];
+    document.getElementById('app').classList.remove('visible');
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('loginPwd').value = '';
+  }
+
+  // ── Data ──────────────────────────────────────────
+  async function loadMessages(isFirstLoad = false) {
+    const bar = document.getElementById('loadingBar');
+    const icon = document.getElementById('refreshIcon');
+    bar.classList.add('visible');
+    icon.style.animation = 'spin 0.7s linear infinite';
+    icon.style.display = 'inline-block';
+
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/messages`, {
+        headers: { 'x-admin-password': adminPassword }
+      });
+
+      if (res.status === 401) {
+        if (isFirstLoad) {
+          document.getElementById('loginError').classList.add('visible');
+        }
+        return;
+      }
+
+      if (isFirstLoad) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('app').classList.add('visible');
+      }
+
+      allMessages = await res.json();
+      updateKPIs();
+      renderMessages();
+
+    } catch {
+      if (isFirstLoad) {
+        document.getElementById('loginError').textContent = 'Serveur inaccessible.';
+        document.getElementById('loginError').classList.add('visible');
+      }
+    } finally {
+      bar.classList.remove('visible');
+      icon.style.animation = '';
+    }
+  }
+
+  function updateKPIs() {
+    document.getElementById('kpiTotal').textContent = allMessages.length;
+    document.getElementById('kpiNew').textContent = allMessages.filter(m => m.statut === 'nouveau').length;
+    document.getElementById('kpiProcessing').textContent = allMessages.filter(m => m.statut === 'en_traitement').length;
+    document.getElementById('kpiClosed').textContent = allMessages.filter(m => m.statut === 'clôturé').length;
+  }
+
+  function setFilter(f, btn) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderMessages();
+  }
+
+  function renderMessages() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    let msgs = allMessages;
+
+    if (currentFilter !== 'tous') {
+      msgs = msgs.filter(m => m.statut === currentFilter);
+    }
+
+    if (search) {
+      msgs = msgs.filter(m =>
+        (m.nom || '').toLowerCase().includes(search) ||
+        (m.entreprise || '').toLowerCase().includes(search) ||
+        (m.email || '').toLowerCase().includes(search) ||
+        (m.message || '').toLowerCase().includes(search)
+      );
+    }
+
+    const list = document.getElementById('messagesList');
+    const empty = document.getElementById('emptyState');
+
+    if (msgs.length === 0) {
+      list.innerHTML = '';
+      empty.classList.add('visible');
+      return;
+    }
+
+    empty.classList.remove('visible');
+    list.innerHTML = msgs.map(m => buildRow(m)).join('');
+  }
+
+  function buildRow(m) {
+    const date = new Date(m.cree_le);
+    const dateStr = date.toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' });
+    const timeStr = date.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+    const preview = (m.message || '').replace(/\n/g, ' ').substring(0, 120) + (m.message?.length > 120 ? '…' : '');
+
+    const tags = [m.mission, m.budget].filter(Boolean);
+
+    return `
+    <div class="msg-row" id="row-${m._id}" onclick="toggleRow('${m._id}')">
+      <span class="msg-status-dot dot-${m.statut}"></span>
+
+      <div class="msg-main">
+        <div class="msg-top">
+          <span class="msg-name">${escHtml(m.nom)}</span>
+          ${m.entreprise ? `<span class="msg-company">· ${escHtml(m.entreprise)}</span>` : ''}
+          <span class="badge badge-${m.statut}">${labelStatut(m.statut)}</span>
+        </div>
+        <p class="msg-preview">${escHtml(preview)}</p>
+
+        <!-- Detail (expanded) -->
+        <div class="msg-detail" id="detail-${m._id}">
+          <div class="detail-grid">
+            <div class="detail-field">
+              <label>Email</label>
+              <span><a href="mailto:${escHtml(m.email)}">${escHtml(m.email)}</a></span>
+            </div>
+            ${m.telephone ? `<div class="detail-field"><label>Téléphone</label><span><a href="tel:${escHtml(m.telephone)}">${escHtml(m.telephone)}</a></span></div>` : ''}
+            ${m.mission ? `<div class="detail-field"><label>Mission</label><span>${escHtml(m.mission)}</span></div>` : ''}
+            ${m.budget ? `<div class="detail-field"><label>Budget</label><span>${escHtml(m.budget)}</span></div>` : ''}
+            <div class="detail-field"><label>Reçu le</label><span>${dateStr} à ${timeStr}</span></div>
+          </div>
+
+          <p class="detail-message-label">Message</p>
+          <div class="detail-message-box">${escHtml(m.message)}</div>
+
+          <div class="detail-actions" onclick="event.stopPropagation()">
+            <a href="mailto:${escHtml(m.email)}?subject=Re: votre demande EMB Consulting" class="action-btn primary">
+              ✉ Répondre par email
+            </a>
+            <button class="action-btn" onclick="changeStatut('${m._id}', 'lu')">Marquer lu</button>
+            <button class="action-btn" onclick="changeStatut('${m._id}', 'en_traitement')">⚙ En traitement</button>
+            <button class="action-btn danger" onclick="changeStatut('${m._id}', 'clôturé')">✓ Clôturer</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="msg-meta">
+        <span class="msg-date">${dateStr}</span>
+        <span class="msg-date">${timeStr}</span>
+        ${tags.length ? `<div class="msg-tags">${tags.map(t => `<span class="tag-small">${escHtml(t)}</span>`).join('')}</div>` : ''}
+      </div>
+    </div>`;
+  }
+
+  function toggleRow(id) {
+    const row = document.getElementById(`row-${id}`);
+    const isExp = row.classList.contains('expanded');
+    // Close all
+    document.querySelectorAll('.msg-row.expanded').forEach(r => r.classList.remove('expanded'));
+    if (!isExp) {
+      row.classList.add('expanded');
+      // Mark as read if nouveau
+      const msg = allMessages.find(m => m._id === id);
+      if (msg && msg.statut === 'nouveau') {
+        changeStatut(id, 'lu', true); // silent
+      }
+    }
+  }
+
+  async function changeStatut(id, statut, silent = false) {
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/messages/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-password': adminPassword,
+        },
+        body: JSON.stringify({ statut }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        const idx = allMessages.findIndex(m => m._id === id);
+        if (idx !== -1) allMessages[idx] = updated;
+        updateKPIs();
+        renderMessages();
+        if (!silent) {
+          // Re-open the row
+          setTimeout(() => {
+            const row = document.getElementById(`row-${id}`);
+            if (row) row.classList.add('expanded');
+          }, 50);
+        }
+      }
+    } catch (err) {
+      console.error('Erreur mise à jour statut', err);
+    }
+  }
+
+  // ── Utils ──────────────────────────────────────────
+  function labelStatut(s) {
+    return { nouveau: 'Nouveau', lu: 'Lu', en_traitement: 'En traitement', 'clôturé': 'Clôturé' }[s] || s;
+  }
+
+  function escHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // Auto-refresh toutes les 60 secondes si connecté
+  setInterval(() => {
+    if (adminPassword) loadMessages();
+  }, 60000);
+</script>
+</body>
+</html>
